@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoPrice Pro - AI Valuation</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg: #000000;
+            --card: #0a0a0a;
+            --accent: #00ff88;
+            --accent2: #00d4ff;
+            --green: #00ff41;
+            --text: #ffffff;
+            --text-secondary: #cccccc;
+            --border: #1a1a1a;
+            --glow: rgba(0, 255, 136, 0.4);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: var(--text);
+            padding: 2rem;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, #00ff88, transparent),
+                radial-gradient(2px 2px at 60% 70%, #00d4ff, transparent),
+                radial-gradient(1px 1px at 50% 50%, #00ff88, transparent),
+                radial-gradient(1px 1px at 80% 10%, #00d4ff, transparent),
+                radial-gradient(2px 2px at 90% 60%, #00ff88, transparent);
+            background-size: 200% 200%;
+            animation: particleMove 15s ease infinite;
+            opacity: 0.5;
+            z-index: -1;
+        }
+        
+        @keyframes particleMove {
+            0%, 100% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(10, 10, 10, 0.8);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            position: relative;
+        }
+        
+        .lang-switcher { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            display: flex; 
+            gap: 0.5rem; 
+        }
+        
+        .lang-btn {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .lang-btn:hover, .lang-btn.active { 
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px var(--glow);
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        h1 i {
+            color: var(--accent);
+            font-size: 1.2em;
+            filter: drop-shadow(0 0 15px var(--glow));
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        
+        #subTitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            background: rgba(0, 255, 136, 0.05);
+            border: 2px solid var(--accent);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            min-width: 150px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent);
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .dashboard { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        @media(max-width: 900px) { 
+            .dashboard { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+        }
+        
+        .card {
+            background: var(--card);
+            border: 2px solid var(--accent);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+        }
+        
+        h2 {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+        
+        .form-row { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1.5rem; 
+            margin-bottom: 1.5rem; 
+        }
+        
+        @media(max-width: 600px) { 
+            .form-row { grid-template-columns: 1fr; }
+        }
+        
+        label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #333;
+            color: #fff;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        select option {
+            background: #0a0a0a;
+            color: #fff;
+        }
+        
+        .price-box {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 212, 255, 0.1));
+            border: 3px solid var(--accent);
+            padding: 3rem;
+            text-align: center;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .price-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        
+        .price-val {
+            font-size: 4rem;
+            color: var(--green);
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 30px rgba(0, 255, 65, 0.6);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1.3rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            color: #000;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 12px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 255, 136, 0.6);
+        }
+        
+        .btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .support-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(0, 255, 136, 0.5);
+            z-index: 1000;
+            text-decoration: none;
+            animation: supportPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes supportPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .support-btn i {
+            font-size: 2rem;
+            color: #000;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            border-top: 2px solid var(--border);
+        }
+        
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="lang-switcher">
+            <button class="lang-btn active" onclick="setLang('ru')">🇷🇺 RU</button>
+            <button class="lang-btn" onclick="setLang('en')">🇬 EN</button>
+            <button class="lang-btn" onclick="setLang('zh')">🇨🇳 中文</button>
+        </div>
+        
+        <h1>
+            <i class="fas fa-car"></i> 
+            AutoPrice <span>PRO</span>
+        </h1>
+        <p id="subTitle" data-i18n="subTitle">Система оценки с ИИ</p>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="carsCount">12,847</div>
+                <div class="stat-label" data-i18n="statCars">Оценено авто</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">99.2%</div>
+                <div class="stat-label" data-i18n="statAccuracy">Точность</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div class="card">
+            <h2 data-i18n="formTitle"><i class="fas fa-sliders-h"></i> Параметры авто</h2>
+            <form id="carForm">
+                <div class="form-row">
+                    <div>
+                        <label data-i18n="labelBrand">Марка</label>
+                        <select id="brand" onchange="updateModels()">
+                            <option value="" data-i18n="selectBrand">Выберите марку</option>
+                            <option value="toyota">Toyota</option>
+                            <option value="bmw">BMW</option>
+                            <option value="mercedes">Mercedes</option>
+                            <option value="audi">Audi</option>
+                            <option value="lexus">Lexus</option>
+                            <option value="kia">Kia</option>
+                            <option value="hyundai">Hyundai</option>
+                            <option value="volkswagen">Volkswagen</option>
+                            <option value="nissan">Nissan</option>
+                            <option value="ford">Ford</option>
+                            <option value="mazda">Mazda</option>
+                            <option value="subaru">Subaru</option>
+                            <option value="honda">Honda</option>
+                            <option value="mitsubishi">Mitsubishi</option>
+                            <option value="chevrolet">Chevrolet</option>
+                            <option value="skoda">Skoda</option>
+                            <option value="volvo">Volvo</option>
+                            <option value="porsche">Porsche</option>
+                            <option value="jeep">Jeep</option>
+                            <option value="landrover">Land Rover</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label data-i18n="labelModel">Модель</label>
+                        <select id="model">
+                            <option value="" data-i18n="selectModelFirst">Сначала выберите марку</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div>
+                        <label data-i18n="labelYear">Год выпуска</label>
+                        <input type="number" id="year" min="1990" max="2026" value="2020">
+                    </div>
+                    <div>
+                        <label data-i18n="labelMileage">Пробег (км)</label>
+                        <input type="number" id="mileage" min="0" value="60000">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div>
+                        <label data-i18n="labelCondition">Состояние</label>
+                        <select id="condition">
+                            <option value="excellent" data-i18n="condExcellent">Отличное</option>
+                            <option value="good" selected data-i18n="condGood">Хорошее</option>
+                            <option value="fair" data-i18n="condFair">Среднее</option>
+                            <option value="damaged" data-i18n="condDamaged">Плохое</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn" id="calcBtn" onclick="calculatePrice()">
+                    <i class="fas fa-calculator"></i> <span data-i18n="calcButton">Рассчитать цену</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 data-i18n="resultTitle"><i class="fas fa-chart-line"></i> Результат оценки</h2>
+            <div class="price-box">
+                <div class="price-label" data-i18n="priceLabel">Рыночная цена</div>
+                <div class="price-val" id="priceDisplay">—</div>
+                <div style="color: #888; margin-top: 10px; font-size: 0.9rem;" id="sourceDisplay"></div>
+            </div>
+            <div style="color: var(--text-secondary); line-height: 1.6;">
+                <i class="fas fa-info-circle" style="color: var(--accent);"></i> 
+                <span data-i18n="resultDesc">Цена рассчитана ИИ на основе анализа рынка 2026 года</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2026 AutoPrice PRO | Powered by YandexGPT AI</p>
+        <p style="margin-top: 0.5rem;">
+            <a href="mailto:demidmatycin@gmail.com">
+                <i class="fas fa-envelope"></i> demidmatycin@gmail.com
+            </a>
+        </p>
+    </div>
+</div>
+
+<a href="mailto:demidmatycin@gmail.com" class="support-btn">
+    <i class="fas fa-comments"></i>
+</a>
+
+<script>
+    // 📚 БАЗА МОДЕЛЕЙ
+    const carModels = {
+        toyota: ['Camry', 'Corolla', 'RAV4', 'Land Cruiser', 'Prado', 'Highlander', 'Avalon', 'Yaris'],
+        bmw: ['3 Series', '5 Series', '7 Series', 'X3', 'X5', 'X7', 'M3', 'M5'],
+        mercedes: ['C-Class', 'E-Class', 'S-Class', 'GLA', 'GLC', 'GLE', 'GLS', 'A-Class'],
+        audi: ['A3', 'A4', 'A6', 'A8', 'Q3', 'Q5', 'Q7', 'Q8', 'e-tron'],
+        lexus: ['ES', 'RX', 'NX', 'GX', 'LX', 'IS', 'LS', 'UX'],
+        kia: ['Optima', 'Sportage', 'Sorento', 'Rio', 'Ceed', 'Seltos', 'K5', 'Mohave'],
+        hyundai: ['Solaris', 'Tucson', 'Santa Fe', 'Creta', 'Elantra', 'Sonata', 'Palisade'],
+        volkswagen: ['Golf', 'Passat', 'Tiguan', 'Touareg', 'Polo', 'Jetta', 'Atlas'],
+        nissan: ['Altima', 'Sentra', 'Rogue', 'Pathfinder', 'Murano', 'X-Trail', 'Qashqai'],
+        ford: ['Focus', 'Fusion', 'Escape', 'Explorer', 'F-150', 'Mustang', 'Edge'],
+        mazda: ['Mazda3', 'Mazda6', 'CX-3', 'CX-5', 'CX-9', 'MX-5', 'CX-30'],
+        subaru: ['Impreza', 'Legacy', 'Outback', 'Forester', 'XV', 'WRX', 'Ascent'],
+        honda: ['Civic', 'Accord', 'CR-V', 'Pilot', 'HR-V', 'Odyssey', 'Fit'],
+        mitsubishi: ['Outlander', 'Pajero', 'Lancer', 'ASX', 'Eclipse Cross', 'Mirage'],
+        chevrolet: ['Cruze', 'Malibu', 'Equinox', 'Traverse', 'Tahoe', 'Camaro', 'Corvette'],
+        skoda: ['Octavia', 'Superb', 'Kodiaq', 'Karoq', 'Fabia', 'Scala', 'Kamiq'],
+        volvo: ['S60', 'S90', 'V60', 'V90', 'XC40', 'XC60', 'XC90'],
+        porsche: ['911', 'Cayenne', 'Macan', 'Panamera', 'Taycan', '718 Boxster'],
+        jeep: ['Wrangler', 'Grand Cherokee', 'Cherokee', 'Compass', 'Renegade', 'Gladiator'],
+        landrover: ['Range Rover', 'Range Rover Sport', 'Range Rover Evoque', 'Discovery', 'Defender']
+    };
+
+    // 🌍 ПОЛНЫЙ ПЕРЕВОД
+    const i18n = {
+        ru: {
+            subTitle: 'Система оценки с ИИ',
+            statCars: 'Оценено авто',
+            statAccuracy: 'Точность',
+            formTitle: '<i class="fas fa-sliders-h"></i> Параметры авто',
+            labelBrand: 'Марка',
+            selectBrand: 'Выберите марку',
+            labelModel: 'Модель',
+            selectModelFirst: 'Сначала выберите марку',
+            labelYear: 'Год выпуска',
+            labelMileage: 'Пробег (км)',
+            labelCondition: 'Состояние',
+            condExcellent: 'Отличное',
+            condGood: 'Хорошее',
+            condFair: 'Среднее',
+            condDamaged: 'Плохое',
+            calcButton: 'Рассчитать цену',
+            resultTitle: '<i class="fas fa-chart-line"></i> Результат оценки',
+            priceLabel: 'Рыночная цена',
+            resultDesc: 'Цена рассчитана ИИ на основе анализа рынка 2026 года',
+            processing: '<i class="fas fa-spinner fa-spin"></i> Обработка...',
+            error: 'Ошибка',
+            selectBrandModel: 'Пожалуйста, выберите марку и модель автомобиля!'
+        },
+        en: {
+            subTitle: 'AI Valuation System',
+            statCars: 'Cars Valued',
+            statAccuracy: 'Accuracy',
+            formTitle: '<i class="fas fa-sliders-h"></i> Car Parameters',
+            labelBrand: 'Brand',
+            selectBrand: 'Select brand',
+            labelModel: 'Model',
+            selectModelFirst: 'Select brand first',
+            labelYear: 'Year',
+            labelMileage: 'Mileage (km)',
+            labelCondition: 'Condition',
+            condExcellent: 'Excellent',
+            condGood: 'Good',
+            condFair: 'Fair',
+            condDamaged: 'Damaged',
+            calcButton: 'Calculate Price',
+            resultTitle: '<i class="fas fa-chart-line"></i> Valuation Result',
+            priceLabel: 'Market Price',
+            resultDesc: 'Price estimated by AI based on 2026 market analysis',
+            processing: '<i class="fas fa-spinner fa-spin"></i> Processing...',
+            error: 'Error',
+            selectBrandModel: 'Please select brand and model!'
+        },
+        zh: {
+            subTitle: 'AI估价系统',
+            statCars: '已评估车辆',
+            statAccuracy: '准确度',
+            formTitle: '<i class="fas fa-sliders-h"></i> 车辆参数',
+            labelBrand: '品牌',
+            selectBrand: '选择品牌',
+            labelModel: '型号',
+            selectModelFirst: '请先选择品牌',
+            labelYear: '年份',
+            labelMileage: '里程 (km)',
+            labelCondition: '车况',
+            condExcellent: '极佳',
+            condGood: '良好',
+            condFair: '一般',
+            condDamaged: '需修',
+            calcButton: '计算价格',
+            resultTitle: '<i class="fas fa-chart-line"></i> 估价结果',
+            priceLabel: '市场价格',
+            resultDesc: '价格由AI根据2026年市场分析估算',
+            processing: '<i class="fas fa-spinner fa-spin"></i> 处理中...',
+            error: '错误',
+            selectBrandModel: '请选择品牌和型号！'
+        }
+    };
+
+    let curLang = 'ru';
+    let currencyRate = 1;
+    let currencySymbol = '₽';
+
+    // 🔄 Обновление моделей
+    function updateModels() {
+        const brandSelect = document.getElementById('brand');
+        const modelSelect = document.getElementById('model');
+        const selectedBrand = brandSelect.value;
+        
+        modelSelect.innerHTML = '';
+        
+        if (selectedBrand && carModels[selectedBrand]) {
+            carModels[selectedBrand].forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+        } else {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = i18n[curLang].selectModelFirst;
+            modelSelect.appendChild(option);
+        }
+    }
+
+    // 🌐 Переключение языка
+    function setLang(lang) {
+        curLang = lang;
+        
+        // Обновляем активную кнопку
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Валюта
+        if(lang === 'en') { 
+            currencyRate = 75; 
+            currencySymbol = '$'; 
+        } else if(lang === 'zh') { 
+            currencyRate = 11; 
+            currencySymbol = '¥'; 
+        } else { 
+            currencyRate = 1; 
+            currencySymbol = '₽'; 
+        }
+        
+        // Перевод всех элементов
+        const t = i18n[lang];
+        
+        document.getElementById('subTitle').textContent = t.subTitle;
+        
+        // Все элементы с data-i18n
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            if (t[key]) {
+                if (key === 'formTitle' || key === 'resultTitle') {
+                    element.innerHTML = t[key];
+                } else {
+                    element.textContent = t[key];
+                }
+            }
+        });
+    }
+
+    // 💰 Расчёт цены
+    async function calculatePrice() {
+        const btn = document.getElementById('calcBtn');
+        const display = document.getElementById('priceDisplay');
+        const source = document.getElementById('sourceDisplay');
+        const brand = document.getElementById('brand').value;
+        const model = document.getElementById('model').value;
+        const year = document.getElementById('year').value;
+        const mileage = document.getElementById('mileage').value;
+        const condition = document.getElementById('condition').value;
+        const t = i18n[curLang];
+
+        if (!brand || !model) {
+            alert(t.selectBrandModel);
+            return;
+        }
+
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = t.processing;
+        display.style.opacity = '0.5';
+
+        try {
+            const response = await fetch('http://localhost:5000/api/get-price', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    brand: brand,
+                    model: model,
+                    year: parseInt(year),
+                    mileage: parseInt(mileage),
+                    condition: condition
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                const price = Math.round(result.price / currencyRate);
+                const formatted = price.toLocaleString(curLang === 'ru' ? 'ru-RU' : (curLang === 'zh' ? 'zh-CN' : 'en-US'));
+                
+                display.textContent = `${formatted} ${currencySymbol}`;
+                display.style.color = '#00ff41';
+                source.textContent = `✓ ${result.source || 'YandexGPT AI'}`;
+                
+                const counter = document.getElementById('carsCount');
+                const currentCount = parseInt(counter.textContent.replace(/\D/g, ''));
+                counter.textContent = (currentCount + 1).toLocaleString();
+            } else {
+                throw new Error('API error');
+            }
+
+        } catch (err) {
+            console.error(err);
+            display.textContent = t.error;
+            display.style.color = 'red';
+            alert('Ошибка подключения к серверу! Проверьте, запущен ли Python сервер.\n\nЕсли сервер запущен, проверьте:\n1. Файл server.py существует\n2. Маршрут /api/get-price работает\n3. В терминале нет ошибок');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            display.style.opacity = '1';
+        }
+    }
+
+    // Анимация счётчика
+    window.addEventListener('load', () => {
+        const counter = document.getElementById('carsCount');
+        let count = 0;
+        const target = 12847;
+        const increment = target / 100;
+        const timer = setInterval(() => {
+            count += increment;
+            if (count >= target) {
+                count = target;
+                clearInterval(timer);
+            }
+            counter.textContent = Math.floor(count).toLocaleString();
+        }, 20);
+    });
+</script>
+
+</body>
+</html>
